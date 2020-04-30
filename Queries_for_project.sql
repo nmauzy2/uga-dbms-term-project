@@ -115,3 +115,13 @@ SET @LEAGUESEARCH = "Belgium Jupiler League";
 SELECT team.team_long_name
 FROM team, (SELECT id FROM league WHERE league.name COLLATE utf8mb4_general_ci = @LEAGUESEARCH) AS leagueid
 WHERE team.team_api_id IN (SELECT home_team_api_id FROM eu_soccer.match WHERE league_id = leagueid.id);
+
+/*returns a list of all teams matched with their respective countries and leagues. It matches teams countries and leagues together 
+through matches, so if there is a team that for some reason does not have a match or a match is missing a team or a country it will be
+excluded*/
+
+SELECT country.name AS country, league.name AS league, team.team_long_name AS team
+FROM eu_soccer.match AS matches, team, league, country
+WHERE matches.home_team_api_id = team.team_api_id AND matches.league_id = league.id AND matches.country_id = country.id
+GROUP BY matches.home_team_api_id
+ORDER BY country.name;
